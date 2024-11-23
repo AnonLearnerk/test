@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just a Simple Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        h2, h1 {
+            color: #333;
+        }
+        p {
+            color: #555;
+            line-height: 1.2;
+        }
+        p.h {
+            font-size: 2rem;
+        }
+        p.ha {
+            font-size: 1.3rem;
+        }
+        .section {
+            display: none;
+        }
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .bg {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100%;
+            width: 100%;
+        }
+        #videoSection {
+            display: none;
+            margin-top: 20px;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="container">
+        <div id="front">
+            <h2>Hey, I need your help with this quick test!</h2>
+            <p>Can you click the button below to see if it works?</p>
+            <button id="testButton">Click Me</button>
+        </div>
+
+        <section id="surpriseSection" class="section">
+            <h1>Surprise!</h1>
+            <b><p class="h">Happy Birthday, Shan! 🎂</p></b>
+            <img src="bg.jpg" alt="" class="bg">
+    
+            <p class="ha">Naay nag wait nga parcel sa gawas, tan-awa karon kaw</p>
+            <p class="ha">Trust me, you don't want to miss it.</p>
+            <p>Watch these two videos after nimog gawas</p>
+            <button id="goToVideoButton">Watch Videos</button>
+        </section>
+
+        <section id="videoSection" class="section">
+            <h1>Amoang kagagoyan</h1>
+            <video id="video1" controls>
+                <source src="c.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <video id="video2" controls style="display: none;">
+                <source src="h.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <button class="back-button" id="backButton">Back</button>
+            <button class="back-button" id="switchVideoButton">Switch Video</button>
+        </section>
+    </div>
+
+    <script>
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        const context = confettiCanvas.getContext('2d');
+        let confettiPieces = [];
+        let animationFrameId;
+
+        const setupConfetti = () => {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            for (let i = 0; i < 100; i++) {
+                confettiPieces.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * confettiCanvas.height,
+                    size: Math.random() * 8 + 2,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    velocityX: Math.random() * 2 - 1,
+                    velocityY: Math.random() * 3 + 2
+                });
+            }
+        };
+
+        const drawConfetti = () => {
+            context.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confettiPieces.forEach(piece => {
+                context.beginPath();
+                context.arc(piece.x, piece.y, piece.size, 0, Math.PI * 2);
+                context.fillStyle = piece.color;
+                context.fill();
+                piece.x += piece.velocityX;
+                piece.y += piece.velocityY;
+
+                if (piece.y > confettiCanvas.height) {
+                    piece.y = 0;
+                    piece.x = Math.random() * confettiCanvas.width;
+                }
+            });
+            animationFrameId = requestAnimationFrame(drawConfetti);
+        };
+
+        const stopConfetti = () => {
+            cancelAnimationFrame(animationFrameId);
+            confettiCanvas.width = 0;
+            confettiCanvas.height = 0;
+        };
+
+        const testButton = document.getElementById('testButton');
+        const goToVideoButton = document.getElementById('goToVideoButton');
+        const backButton = document.getElementById('backButton');
+        const switchVideoButton = document.getElementById('switchVideoButton');
+        const front = document.getElementById('front');
+        const surpriseSection = document.getElementById('surpriseSection');
+        const videoSection = document.getElementById('videoSection');
+        const video1 = document.getElementById('video1');
+        const video2 = document.getElementById('video2');
+
+        testButton.addEventListener('click', () => {
+            surpriseSection.style.display = 'block';
+            testButton.style.display = 'none';
+            front.style.display = 'none';
+            setupConfetti();
+            drawConfetti();
+        });
+
+        goToVideoButton.addEventListener('click', () => {
+            surpriseSection.style.display = 'none';
+            videoSection.style.display = 'block';
+            stopConfetti();
+            video1.style.display = 'block';
+            video2.style.display = 'none';
+        });
+
+        backButton.addEventListener('click', () => {
+            videoSection.style.display = 'none';
+            surpriseSection.style.display = 'block';
+            setupConfetti();
+            drawConfetti();
+        });
+
+        switchVideoButton.addEventListener('click', () => {
+            if (video1.style.display === 'block') {
+                video1.style.display = 'none';
+                video2.style.display = 'block';
+            } else {
+                video1.style.display = 'block';
+                video2.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
